@@ -1,23 +1,38 @@
 from django.shortcuts import render, redirect,get_object_or_404
 from django.contrib.auth.decorators import login_required
 from .models import Task
-from .forms import TaskForm
+from .forms import TaskForm, CustomUserCreationForm
 from django.contrib.auth import login, authenticate
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
+import json  # Import Python's built-in json tool at the top of your views.py
+from django.contrib import messages  # Standard Django message framework
+
 
 def register_view(request):
     if request.user.is_authenticated:
-        return redirect('tas_list')
+        return redirect('task_list')
 
     if request.method == 'POST':
-        form = UserCreationForm(request.POST)
+        form = CustomUserCreationForm(request.POST)
+        
         if form.is_valid():
             user = form.save()
             login(request, user)
             return redirect('task_list')
+        else:
+            # Loop through errors and add them to Django messages
+            for field, errors in form.errors.items():
+                for error in errors:
+                    messages.error(request, f"{field.capitalize()}: {error}")
+            
+            # This redirect completely protects you from the refresh popup!
+            return redirect('register') 
+            
     else:
-        form = UserCreationForm()
-    return render(request, 'my_app/login.html', {'form':form})
+        form = CustomUserCreationForm()
+            
+    return render(request, 'my_app/register.html', {'form': form})
+
 
 def login_view(request):
     if request.user.is_authenticated:
