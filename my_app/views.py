@@ -12,21 +12,23 @@ def register_view(request):
         return redirect('task_list')
 
     if request.method == 'POST':
-        # 1. Pass CustomUserCreationForm here instead if you want your auto-save logic to work!
-        form = UserCreationForm(request.POST) 
+        form = UserCreationForm(request.POST)
         
         if form.is_valid():
             user = form.save()
             login(request, user)
             return redirect('task_list')
-        
-        # ❌ REMOVED: The loop and the redirect statement are gone.
+        else:
+    
+            for field, errors in form.errors.items():
+                for error in errors:
+                    messages.error(request, f"{field.capitalize()}: {error}")
+             # This redirect completely protects you from the refresh popup!
+            return redirect('register') 
             
     else:
         form = UserCreationForm()
             
-    # ✅ FIX: When the form is invalid, Django automatically passes the 'form' 
-    # (which still holds the typed username and error data) straight into the HTML context.
     return render(request, 'my_app/register.html', {'form': form})
 
 
