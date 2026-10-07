@@ -1,11 +1,10 @@
 from django.shortcuts import render, redirect,get_object_or_404
 from django.contrib.auth.decorators import login_required
 from .models import Task
-from .forms import TaskForm, CustomUserCreationForm
+from .forms import TaskForm
 from django.contrib.auth import login, authenticate
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
-import json  # Import Python's built-in json tool at the top of your views.py
-from django.contrib import messages  # Standard Django message framework
+from django.contrib import messages 
 
 
 def register_view(request):
@@ -13,24 +12,21 @@ def register_view(request):
         return redirect('task_list')
 
     if request.method == 'POST':
-        form = CustomUserCreationForm(request.POST)
+        # 1. Pass CustomUserCreationForm here instead if you want your auto-save logic to work!
+        form = UserCreationForm(request.POST) 
         
         if form.is_valid():
             user = form.save()
             login(request, user)
             return redirect('task_list')
-        else:
-            # Loop through errors and add them to Django messages
-            for field, errors in form.errors.items():
-                for error in errors:
-                    messages.error(request, f"{field.capitalize()}: {error}")
-            
-            # This redirect completely protects you from the refresh popup!
-            return redirect('register') 
+        
+        # ❌ REMOVED: The loop and the redirect statement are gone.
             
     else:
-        form = CustomUserCreationForm()
+        form = UserCreationForm()
             
+    # ✅ FIX: When the form is invalid, Django automatically passes the 'form' 
+    # (which still holds the typed username and error data) straight into the HTML context.
     return render(request, 'my_app/register.html', {'form': form})
 
 
