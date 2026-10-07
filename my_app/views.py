@@ -23,7 +23,6 @@ def register_view(request):
             for field, errors in form.errors.items():
                 for error in errors:
                     messages.error(request, f"{field.capitalize()}: {error}")
-             # This redirect completely protects you from the refresh popup!
             return redirect('register') 
             
     else:
