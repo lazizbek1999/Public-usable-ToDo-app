@@ -9,6 +9,13 @@
             </div>
 
             <div class="card-body p-4">
+                {% if messages %}
+                <div style="background-color: #ffe6e6; color: #cc0000; padding: 10px; border-radius: 5px; margin-bottom: 15px;">
+                    {% for message in messages %}
+                        <p style="margin: 5px 0;">{{message}}</p>
+                    {% endfor %}
+                </div>
+                {% endif %}
                 <form method="POST">
                     {% csrf_token %}
                     {{form.as_p}}
